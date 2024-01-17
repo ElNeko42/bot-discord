@@ -1,5 +1,25 @@
 import discord
 import aiohttp
+from flask import Flask
+from threading import Thread
+import random
+
+app = Flask('')
+
+
+@app.route('/')
+def home():
+  return "¡Estoy vivo!"
+
+
+def run():
+  app.run(host='0.0.0.0', port=8080)
+
+
+def keep_alive():
+  t = Thread(target=run)
+  t.start()
+
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -8,6 +28,14 @@ client = discord.Client(intents=intents)
 
 # Diccionario para llevar el conteo de comandos utilizados por usuario
 command_usage = {}
+command_list = {
+    '$juegosgratis':
+    'Muestra una lista de juegos gratis disponibles en diferentes plataformas.',
+    '$pajagrupal': 'Inicia una cuenta atrás para una paja grupal.',
+    '$gay': 'Analiza tu porcentaje de homosexualidad que tienes.',
+    '$banana': 'Digo el tamaño de tu banana.',
+    # Añade aquí otros comandos que tengas
+}
 
 
 @client.event
@@ -56,7 +84,6 @@ async def on_message(message):
       if response_message:
         await message.channel.send(response_message)
 
-  # Nuevo comando personalizado
   elif message.content.startswith('$pajagrupal'):
     user = message.author
 
@@ -70,8 +97,27 @@ async def on_message(message):
 
     # Enviar mensaje con el conteo
     await message.channel.send(
-        f"{user_display_name}, ha iniciado una paja grupal en 5 minutos ,esto no es un simulacro ,\n la duración será de 30 minutos lleven vaselina y galletas ,\n repito paja grupal en 5 minutos esto no es un simulacro ,\n la duración será de 30 minutos lleven vaselina y disfruten .\n\n Has usado este comando  {command_usage[user]} veces."
+        f"{user_display_name}, ha iniciado una paja grupal en 5 minutos ,esto no es un simulacro ,\n la duración será de 30 minutos lleven vaselina y galletas ,\n repito paja grupal en 5 minutos esto no es un simulacro ,\n la duración será de 30 minutos lleven vaselina y disfruten .\n\n Te has masturbado con tus panas  {command_usage[user]} veces."
     )
 
+  elif message.content.startswith('$gay'):
+    user = message.author
+    user_display_name = user.display_name
 
+    random_number = random.randint(0, 100)
+    await message.channel.send(
+        f"Tu porcentaje de homosexualidad es : {random_number}%")
+
+  elif message.content.startswith('$banana'):
+    random_number = random.randint(5, 30)
+    await message.channel.send(f"Tu Banana mide {random_number}cm")
+
+  elif message.content.startswith('$comandos'):
+    commands_description = "Lista de comandos disponibles:\n"
+    for command, description in command_list.items():
+      commands_description += f"**{command}**: {description}\n"
+    await message.channel.send(commands_description)
+
+
+keep_alive()
 client.run('TOKEN')
